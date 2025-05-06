@@ -259,3 +259,27 @@ class CountriesByLanguageAPIView(APIView):
             )
 
         return Response(names, status=status.HTTP_200_OK)
+    
+
+class CountrySearchAPIView(APIView):
+    def get(self, request):
+        search = request.query_params.get('search', '').strip()
+        if not search:
+            return Response(
+                {"error": "Query parameter 'search' is required for searching."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Partial, case‑insensitive match against common or official name
+        # search_result = Country.objects.filter(name_common__icontains=search) \
+        #                     .union(
+        #                         Country.objects.filter(name_official__icontains=search)
+        #                     )
+
+        search_result = Country.objects.filter(name_common__icontains=search)
+
+        if not search_result.exists():
+            return Response([], status=status.HTTP_200_OK)
+
+        serializer = CountrySerializer(search_result, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

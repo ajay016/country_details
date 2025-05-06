@@ -11,4 +11,5 @@ urlpatterns = [
     path('delete-country/<str:cca3>', views.CountryDeleteAPIView.as_view(), name='delete_country'),
     path('regional-countries/<str:cca3>', views.RegionalCountriesAPIView.as_view(), name='regional_countries'),
     path('same-language/<str:lang_code>', views.CountriesByLanguageAPIView.as_view(), name='same_language'),
+    path('countries/search/', views.CountrySearchAPIView.as_view(), name='country-search'),
 ]
