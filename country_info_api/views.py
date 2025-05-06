@@ -238,3 +238,24 @@ class RegionalCountriesAPIView(APIView):
         names = list(same_region_countries.values_list('name_common', flat=True))
 
         return Response(names, status=status.HTTP_200_OK)
+    
+
+class CountriesByLanguageAPIView(APIView):
+    def get(self, request, lang_code):
+        # Normalize language code
+        lang_code = lang_code.lower()
+
+        # Ensure the language exists
+        language = get_object_or_404(Language, code=lang_code)
+
+        # All countries that have this language
+        countries = Country.objects.filter(languages=language)
+        names = list(countries.values_list('name_common', flat=True))
+
+        if not names:
+            return Response(
+                {"message": f"No countries found for language '{lang_code}'."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        return Response(names, status=status.HTTP_200_OK)
