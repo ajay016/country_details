@@ -105,3 +105,104 @@ class CreateCountryView(APIView):
             )
 
         return Response({"success": "Country created successfully."}, status=status.HTTP_201_CREATED)
+    
+
+class CountryUpdateAPIView(APIView):
+    @transaction.atomic
+    def put(self, request, cca3):
+        original_cca3 = cca3.upper()
+        data = request.data
+        new_cca3 = data.get("cca3", "").upper()
+
+        try:
+            country = Country.objects.get(cca3=original_cca3)
+        except Country.DoesNotExist:
+            return Response({"error": "Country not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if new_cca3 != original_cca3:
+            if Country.objects.filter(cca3=new_cca3).exclude(id=country.id).exists():
+                return Response({"error": "A country with this new cca3 already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update core fields
+        country.name_common = data["name"]["common"]
+        country.name_official = data["name"]["official"]
+        country.native_names = data["name"].get("nativeName", {})
+        country.alt_spellings = data.get("altSpellings", [])
+        country.tld = data.get("tld", [])
+        country.cca2 = data.get("cca2")
+        country.ccn3 = data.get("ccn3")
+        country.cca3 = data.get("cca3")
+        country.cioc = data.get("cioc")
+        country.independent = data.get("independent", False)
+        country.status = data.get("status")
+        country.un_member = data.get("unMember", False)
+        country.idd_root = data.get("idd", {}).get("root")
+        country.idd_suffixes = data.get("idd", {}).get("suffixes", [])
+        country.region = data.get("region")
+        country.subregion = data.get("subregion")
+        country.latlng = data.get("latlng", [])
+        country.landlocked = data.get("landlocked", False)
+        country.area = data.get("area", 0.0)
+        country.capital = data.get("capital", [])
+        country.capital_info = data.get("capitalInfo", {})
+        country.population = data.get("population", 0)
+        country.demonyms = data.get("demonyms", {})
+        country.gini = data.get("gini", {})
+        country.fifa = data.get("fifa")
+        country.timezones = data.get("timezones", [])
+        country.start_of_week = data.get("startOfWeek")
+        country.car_signs = data.get("car", {}).get("signs", [])
+        country.car_side = data.get("car", {}).get("side")
+        country.postal_code_format = data.get("postalCode", {}).get("format")
+        country.postal_code_regex = data.get("postalCode", {}).get("regex")
+        country.flag = data.get("flag")
+        country.flag_png = data.get("flags", {}).get("png")
+        country.flag_svg = data.get("flags", {}).get("svg")
+        country.flag_alt = data.get("flags", {}).get("alt")
+        country.coat_of_arms_png = data.get("coatOfArms", {}).get("png")
+        country.coat_of_arms_svg = data.get("coatOfArms", {}).get("svg")
+        country.maps_google = data.get("maps", {}).get("googleMaps")
+        country.maps_osm = data.get("maps", {}).get("openStreetMaps")
+
+        country.save()
+
+        # Update ManyToMany relationships if provided
+        if "continents" in data:
+            country.continents.clear()
+            for cont_name in data["continents"]:
+                cont, _ = Continent.objects.get_or_create(name=cont_name)
+                country.continents.add(cont)
+
+        if "borders" in data:
+            country.borders.clear()
+            for border_cca3 in data["borders"]:
+                neighbor = Country.objects.filter(cca3=border_cca3.upper()).first()
+                if neighbor:
+                    country.borders.add(neighbor)
+
+        if "languages" in data:
+            country.languages.clear()
+            for code, name in data["languages"].items():
+                lang, _ = Language.objects.get_or_create(code=code, defaults={"name": name})
+                country.languages.add(lang)
+
+        if "currencies" in data:
+            country.currencies.clear()
+            for code, info in data["currencies"].items():
+                cur, _ = Currency.objects.get_or_create(
+                    code=code,
+                    defaults={"name": info.get("name"), "symbol": info.get("symbol")},
+                )
+                country.currencies.add(cur)
+
+        if "translations" in data:
+            country.translations.all().delete()
+            for lang_code, vals in data["translations"].items():
+                Translation.objects.create(
+                    country=country,
+                    language_code=lang_code,
+                    official=vals.get("official"),
+                    common=vals.get("common"),
+                )
+
+        return Response({"success": f"Country '{country.name_common}' updated successfully."})
