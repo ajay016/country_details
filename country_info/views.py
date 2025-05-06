@@ -1,25 +1,43 @@
 from django.shortcuts import render
+from django.core.paginator import Paginator
 import requests
 import json
 from django.http import JsonResponse
-
+from .models import *
+from country_info_api.serializers import CountrySerializer
 
 
 def home(request):
-    return render(request, 'country_info/home.html')
+    qs = Country.objects.all()
+
+    # 🔍 Search filter
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        qs = qs.filter(name_common__icontains=search_query)
+
+    # 📄 Pagination
+    per_page = 10 
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(qs, per_page)
+    page_obj = paginator.get_page(page_number)
+
+    # 🔄 Serialize only the current page’s items
+    serializer = CountrySerializer(page_obj.object_list, many=True)
+
+    return render(request, 'country_info/index.html', {
+        'countries':    serializer.data,
+        'page_obj':     page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+        # you can pass the search string back if you need it explicitly:
+        'search':       search_query,
+    })
 
 
-def get_country_data(request):
-    url = 'https://restcountries.com/v3.1/all'
+def country_details(request):
+    countries = Country.objects.all()
+    serializer = CountrySerializer(countries, many=True)
     
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        data = response.json()
-
-        with open('country_info/countries.json', 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=4, ensure_ascii=False)
-        
-        return JsonResponse(data, safe=False)
-    else:
-        return JsonResponse({'error': 'Failed to fetch data from API'}, status=response.status_code)
+    context = {
+        'countries': serializer.data
+    }
+    return render(request, 'country_info/index.html', context)
