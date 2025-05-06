@@ -219,3 +219,22 @@ class CountryDeleteAPIView(APIView):
             {"message": f"Country with CCA3 '{cca3}' deleted successfully."},
             status=status.HTTP_204_NO_CONTENT
         )
+    
+
+class RegionalCountriesAPIView(APIView):
+    def get(self, request, cca3):
+        cca3 = cca3.upper()
+        country = get_object_or_404(Country, cca3=cca3)
+
+        region = country.region
+        if not region:
+            return Response(
+                {"error": f"Region not set for country '{cca3}'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # All other countries in the same region
+        same_region_countries = Country.objects.filter(region=region).exclude(cca3=cca3)
+        names = list(same_region_countries.values_list('name_common', flat=True))
+
+        return Response(names, status=status.HTTP_200_OK)

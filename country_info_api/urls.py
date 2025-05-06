@@ -9,4 +9,5 @@ urlpatterns = [
     path('create-country/', views.CreateCountryView.as_view(), name='create_country'),
     path('update-country/<str:cca3>', views.CountryUpdateAPIView.as_view(), name='update_country'),
     path('delete-country/<str:cca3>', views.CountryDeleteAPIView.as_view(), name='delete_country'),
+    path('regional-countries/<str:cca3>', views.RegionalCountriesAPIView.as_view(), name='regional_countries'),
 ]
