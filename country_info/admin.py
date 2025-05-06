@@ -33,4 +33,4 @@ class CountryAdmin(admin.ModelAdmin):
     search_fields = ("name_common", "cca2", "cca3")
     list_filter = ("region", "subregion", "un_member", "landlocked")
     filter_horizontal = ("currencies", "languages", "borders", "continents")
-    readonly_fields = ("flag_emoji",)
+    readonly_fields = ("flag",)

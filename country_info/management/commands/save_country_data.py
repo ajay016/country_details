@@ -54,7 +54,7 @@ class Command(BaseCommand):
                 area = item.get("area", 0.0),
 
                 capital = item.get("capital", []),
-                capital_info = item.get("capitalInfo", {}).get("latlng", []),
+                capital_info = item.get("capitalInfo", {}),
 
                 population = item.get("population", 0),
                 demonyms = item.get("demonyms", {}),
@@ -70,7 +70,7 @@ class Command(BaseCommand):
                 postal_code_format = item.get("postalCode", {}).get("format"),
                 postal_code_regex = item.get("postalCode", {}).get("regex"),
 
-                flag_emoji = item.get("flag"),
+                flag = item.get("flag"),
                 flag_png = item.get("flags", {}).get("png"),
                 flag_svg = item.get("flags", {}).get("svg"),
                 coat_of_arms_png = item.get("coatOfArms", {}).get("png"),

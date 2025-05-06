@@ -70,7 +70,7 @@ class Country(models.Model):
     timezones = models.JSONField()
     continents = models.ManyToManyField(Continent)
 
-    flag_emoji = models.CharField(max_length=10, null=True, blank=True)
+    flag = models.CharField(max_length=10, null=True, blank=True)
     flag_png = models.URLField(null=True, blank=True)
     flag_svg = models.URLField(null=True, blank=True)
     flag_alt = models.CharField(max_length=255, null=True, blank=True)

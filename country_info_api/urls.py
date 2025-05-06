@@ -5,4 +5,5 @@ from . import views
 
 urlpatterns = [
     path('country-list/', views.CountryListAPIView.as_view(), name='country_list'),
+    path('country-details/<str:cca3>/', views.CountryDetailView.as_view(), name='country_details'),
 ]
