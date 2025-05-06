@@ -21,63 +21,55 @@ class Command(BaseCommand):
         for name in all_continents:
             Continent.objects.get_or_create(name=name)
 
-        # Create countries (without M2M fields)
+        # Create countries
         code_to_country = {}
         for item in data:
             cca3 = item.get("cca3")
             if not cca3:
                 continue
 
-            country = Country.objects.create(
-                name_common = item["name"]["common"],
-                name_official = item["name"]["official"],
-                native_names = item["name"].get("nativeName", {}),
-                alt_spellings = item.get("altSpellings", []),
-
-                tld = item.get("tld", []),
-                cca2 = item.get("cca2"),
-                ccn3 = item.get("ccn3"),
-                cca3 = cca3,
-                cioc = item.get("cioc"),
-
-                independent = item.get("independent", False),
-                status = item.get("status"),
-                un_member = item.get("unMember", False),
-
-                idd_root = item.get("idd", {}).get("root"),
-                idd_suffixes = item.get("idd", {}).get("suffixes", []),
-
-                region = item.get("region"),
-                subregion = item.get("subregion"),
-                latlng = item.get("latlng", []),
-                landlocked = item.get("landlocked", False),
-                area = item.get("area", 0.0),
-
-                capital = item.get("capital", []),
-                capital_info = item.get("capitalInfo", {}),
-
-                population = item.get("population", 0),
-                demonyms = item.get("demonyms", {}),
-                gini = item.get("gini", {}),
-
-                fifa = item.get("fifa"),
-                timezones = item.get("timezones", []),
-                start_of_week = item.get("startOfWeek"),
-
-                car_signs = item.get("car", {}).get("signs", []),
-                car_side = item.get("car", {}).get("side"),
-
-                postal_code_format = item.get("postalCode", {}).get("format"),
-                postal_code_regex = item.get("postalCode", {}).get("regex"),
-
-                flag = item.get("flag"),
-                flag_png = item.get("flags", {}).get("png"),
-                flag_svg = item.get("flags", {}).get("svg"),
-                coat_of_arms_png = item.get("coatOfArms", {}).get("png"),
-                coat_of_arms_svg = item.get("coatOfArms", {}).get("svg"),
-
-                maps_google = item.get("maps", {}).get("googleMaps"),
-                maps_osm = item.get("maps", {}).get("openStreetMaps"),
+            country, created = Country.objects.update_or_create(
+                cca3=cca3,
+                defaults = {
+                    "name_common": item["name"]["common"],
+                    "name_official": item["name"]["official"],
+                    "native_names": item["name"].get("nativeName", {}),
+                    "alt_spellings": item.get("altSpellings", []),
+                    "tld": item.get("tld", []),
+                    "cca2": item.get("cca2"),
+                    "ccn3": item.get("ccn3"),
+                    "cioc": item.get("cioc"),
+                    "independent": item.get("independent", False),
+                    "status": item.get("status"),
+                    "un_member": item.get("unMember", False),
+                    "idd_root": item.get("idd", {}).get("root"),
+                    "idd_suffixes": item.get("idd", {}).get("suffixes", []),
+                    "region": item.get("region"),
+                    "subregion": item.get("subregion"),
+                    "latlng": item.get("latlng", []),
+                    "landlocked": item.get("landlocked", False),
+                    "area": item.get("area", 0.0),
+                    "capital": item.get("capital", []),
+                    "capital_info": item.get("capitalInfo", {}),
+                    "population": item.get("population", 0),
+                    "demonyms": item.get("demonyms", {}),
+                    "gini": item.get("gini", {}),
+                    "fifa": item.get("fifa"),
+                    "timezones": item.get("timezones", []),
+                    "start_of_week": item.get("startOfWeek"),
+                    "car_signs": item.get("car", {}).get("signs", []),
+                    "car_side": item.get("car", {}).get("side"),
+                    "postal_code_format": item.get("postalCode", {}).get("format"),
+                    "postal_code_regex": item.get("postalCode", {}).get("regex"),
+                    "flag": item.get("flag"),
+                    "flag_png": item.get("flags", {}).get("png"),
+                    "flag_svg": item.get("flags", {}).get("svg"),
+                    "flag_alt": item.get("flags", {}).get("alt"),
+                    "coat_of_arms_png": item.get("coatOfArms", {}).get("png"),
+                    "coat_of_arms_svg": item.get("coatOfArms", {}).get("svg"),
+                    "maps_google": item.get("maps", {}).get("googleMaps"),
+                    "maps_osm": item.get("maps", {}).get("openStreetMaps"),
+                }
             )
 
             for cont_name in item.get("continents", []):
