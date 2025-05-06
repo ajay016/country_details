@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from django.db import transaction
 from country_info.models import *
@@ -206,3 +207,15 @@ class CountryUpdateAPIView(APIView):
                 )
 
         return Response({"success": f"Country '{country.name_common}' updated successfully."})
+    
+
+class CountryDeleteAPIView(APIView):
+    def delete(self, request, cca3):
+        cca3 = cca3.upper()  # Ensure consistent formatting
+        country = get_object_or_404(Country, cca3=cca3)
+
+        country.delete()
+        return Response(
+            {"message": f"Country with CCA3 '{cca3}' deleted successfully."},
+            status=status.HTTP_204_NO_CONTENT
+        )
