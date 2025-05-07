@@ -37,6 +37,7 @@ class CountryDetailView(APIView):
 
 
 class CreateCountryView(APIView):
+    permission_classes = [IsAuthenticated]
     @transaction.atomic
     def post(self, request):
         data = request.data
@@ -121,6 +122,7 @@ class CreateCountryView(APIView):
     
 
 class CountryUpdateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     @transaction.atomic
     def put(self, request, cca3):
         original_cca3 = cca3.upper()
@@ -222,6 +224,7 @@ class CountryUpdateAPIView(APIView):
     
 
 class CountryDeleteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def delete(self, request, cca3):
         cca3 = cca3.upper()  # Ensure consistent formatting
         country = get_object_or_404(Country, cca3=cca3)
@@ -234,6 +237,7 @@ class CountryDeleteAPIView(APIView):
     
 
 class RegionalCountriesAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, cca3):
         cca3 = cca3.upper()
         country = get_object_or_404(Country, cca3=cca3)
@@ -253,6 +257,7 @@ class RegionalCountriesAPIView(APIView):
     
 
 class CountriesByLanguageAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, lang_code):
         # Normalize language code
         lang_code = lang_code.lower()
@@ -274,6 +279,7 @@ class CountriesByLanguageAPIView(APIView):
     
 
 class CountrySearchAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         search = request.query_params.get('search', '').strip()
         if not search:
