@@ -1,13 +1,39 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 import requests
 import json
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
 from .models import *
 from country_info_api.serializers import CountrySerializer
 
 
+
+def login_user(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('home')  # Replace 'home' with your actual home view name
+        else:
+            messages.error(request, 'Invalid username or password.')
+
+    return render(request, 'country_info/authentication/login_user.html')
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('login_user')
+
+
+@login_required(login_url='login_user')
 def home(request):
     qs = Country.objects.all()
 

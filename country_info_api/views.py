@@ -3,18 +3,30 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from django.db import transaction
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 from country_info.models import *
 from .serializers import *
 
 
 
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        token = Token.objects.get(key=response.data['token'])
+        return Response({'token': token.key})
+
+
 class CountryListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         names = list(Country.objects.values_list('name_common', flat=True))
         return Response(names, status=status.HTTP_200_OK)
 
 
 class CountryDetailView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, cca3):
         try:
             country = Country.objects.get(cca3=cca3.upper())
