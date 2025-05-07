@@ -1,5 +1,25 @@
 {% extends "country_info/base.html" %}
 
+{% block css %}
+<style>
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.5em 0.75em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+{% endblock css %}
+
+
 {% block content %}
 <div class="container mt-4">
     <div class="card shadow-sm">
@@ -45,6 +65,8 @@
                             <th scope="col">Capital</th>
                             <th scope="col">Population</th>
                             <th scope="col">Timezone</th>
+                            <th scope="col">Details</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -81,6 +103,14 @@
                                 {% else %}
                                     -
                                 {% endif %}
+                            </td>
+
+                            <td class="align-middle text-center">
+                                <button class="btn btn-sm btn-outline-primary details-btn" 
+                                        data-cca3="{{ country.cca3 }}"
+                                        data-country-name="{{ country.name.common }}">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
                             </td>
                         </tr>
                         {% empty %}
@@ -145,4 +175,113 @@
         </div>
     </div>
 </div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="countryDetailsModal" tabindex="-1" aria-labelledby="countryDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="countryDetailsModalLabel">Country Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4 id="modal-country-name" class="mb-4 text-center"></h4>
+                
+                <!-- Languages Section -->
+                <div class="mb-4">
+                    <h5 class="mb-3 border-bottom pb-2">Languages Spoken</h5>
+                    <div id="languages-container" class="d-flex flex-wrap gap-2">
+                        <!-- Languages will be populated as cards here -->
+                        <div class="text-muted">Loading languages...</div>
+                    </div>
+                </div>
+                
+                <!-- Regional Countries Section -->
+                <div class="mt-4">
+                    <h5 class="mb-3 border-bottom pb-2">Neighboring Countries in Same Region</h5>
+                    <div id="regional-countries-container" class="d-flex flex-wrap gap-2">
+                        <!-- Regional countries will be populated as cards here -->
+                        <div class="text-muted">Loading regional countries...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const countryDetailsModal = new bootstrap.Modal(document.getElementById('countryDetailsModal'));
+        
+        document.querySelectorAll('.details-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const cca3 = this.getAttribute('data-cca3');
+                const countryName = this.getAttribute('data-country-name');
+                
+                document.getElementById('modal-country-name').textContent = countryName;
+                
+                // Clear previous data
+                document.getElementById('languages-container').innerHTML = '<div class="text-muted">Loading languages...</div>';
+                document.getElementById('regional-countries-container').innerHTML = '<div class="text-muted">Loading regional countries...</div>';
+                
+                fetch(`/view-country-details/${cca3}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Populate languages as cards
+                        const languagesContainer = document.getElementById('languages-container');
+                        languagesContainer.innerHTML = '';
+                        
+                        if (data.languages && data.languages.length > 0) {
+                            data.languages.forEach(language => {
+                                const card = document.createElement('div');
+                                card.className = 'card border-primary';
+                                card.style.width = '120px';
+                                card.innerHTML = `
+                                    <div class="card-body p-2 text-center">
+                                        <span>${language}</span>
+                                    </div>
+                                `;
+                                languagesContainer.appendChild(card);
+                            });
+                        } else {
+                            languagesContainer.innerHTML = '<div class="text-muted">No language data available</div>';
+                        }
+                        
+                        // Populate regional countries as cards
+                        const countriesContainer = document.getElementById('regional-countries-container');
+                        countriesContainer.innerHTML = '';
+                        
+                        if (data.same_region_countries && data.same_region_countries.length > 0) {
+                            data.same_region_countries.forEach(country => {
+                                const card = document.createElement('div');
+                                card.className = 'card border-success';
+                                card.style.width = '150px';
+                                card.innerHTML = `
+                                    <div class="card-body p-2 text-center">
+                                        <span>${country}</span>
+                                    </div>
+                                `;
+                                countriesContainer.appendChild(card);
+                            });
+                        } else {
+                            countriesContainer.innerHTML = '<div class="text-muted">No regional country data available</div>';
+                        }
+                        
+                        countryDetailsModal.show();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('languages-container').innerHTML = '<div class="text-danger">Error loading data</div>';
+                        document.getElementById('regional-countries-container').innerHTML = '<div class="text-danger">Error loading data</div>';
+                        countryDetailsModal.show();
+                    });
+            });
+        });
+    });
+    </script>
+{% endblock js %}
