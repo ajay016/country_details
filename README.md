@@ -84,7 +84,7 @@ Example with curl:
 `curl -H "Authorization: Token your_generated_token" http://127.0.0.1:8000/api/country-details/bgd/`
 
 
-# GET `/api/country-list/` — Get Country List
+# 1. GET `/api/country-list/` — Get Country List
 Description:
 Retrieves all countries in a list format.
 This endpoint requires authentication via a token.
@@ -98,10 +98,10 @@ Token is obtained by logging in through /api-token-auth/ (or your token URL if d
 
 ## Request
 Method: GET
-URL: /api/country-list/
+URL: `/api/country-list/`
 
 
-# GET /api/country-details/<cca3>/ — Get Country Details
+# 2. GET `/api/country-details/<cca3>/` — Get Country Details
 Description:
 Retrieves details of a specific country using its cca3 (3-letter country code).
 Authentication with token is required.
@@ -114,7 +114,7 @@ Header Example: `Authorization: Token your_token_here`
 
 ## Request
 Method: GET
-URL: /api/country-details/<cca3>/
+URL: `/api/country-details/<cca3>/`
 Replace <cca3> with the actual 3-letter country code.
 Example: /api/country-details/USA/
 
@@ -133,7 +133,7 @@ Headers: `Authorization: Token your_token_here`
 ```
 
 
-# POST /api/create-country/ — Create a New Country
+# 3. POST `/api/create-country/` — Create a New Country
 Description: Creates a new country entry. Requires authentication via token.
 
 Authentication Required
@@ -385,7 +385,7 @@ Content-Type: application/json
     }
     ```
 
-# PUT /api/update-country/<cca3>/ — Update a Country
+# 4. PUT `/api/update-country/<cca3>/` — Update a Country
 Description:
 Updates the details of a specific country identified by its cca3 code. Requires authentication via token.
 
@@ -396,14 +396,14 @@ Header Example: `Authorization: Token your_token_here`
 
 ## Request
 Method: PUT
-URL: /api/update-country/NOR/ — Replace NOR with the actual cca3 of the country you want to update.
+URL: `/api/update-country/NOR/` — Replace NOR with the actual cca3 of the country you want to update.
 
 Headers: `Authorization: Token your_token_here`
 
 
 ## Request
 Method: PUT
-URL: /api/update-country/NOR/ — Replace NOR with the actual cca3 of the country you want to update.
+URL: `/api/update-country/NOR/` — Replace NOR with the actual cca3 of the country you want to update.
 
 Headers: 
 ```
@@ -644,7 +644,7 @@ Content-Type: application/json
 ```
 
 
-# DELETE /api/delete-country/<cca3>/ — Delete a Country
+# 5. DELETE `/api/delete-country/<cca3>/` — Delete a Country
 Description: Deletes a specific country identified by its cca3 code. Requires token-based authentication.
 
  Authentication Required
@@ -654,7 +654,7 @@ Header Example: `Authorization: Token your_token_here`
 
 ## Request
 Method: DELETE
-URL: /api/delete-country/NOR/ — Replace NOR with the cca3 of the country you want to delete.
+URL: `/api/delete-country/NOR/` — Replace NOR with the cca3 of the country you want to delete.
 
 Headers: `Authorization: Token your_token_here`
 
@@ -667,7 +667,7 @@ Headers: `Authorization: Token your_token_here`
 
 
 
-# GET /api/regional-countries/<cca3>/ — Get Countries in the Same Region
+# 6. GET `/api/regional-countries/<cca3>/` — Get Countries in the Same Region
 Description: Fetches a list of countries that are in the same region as the country identified by the provided cca3 code.
 
 Authentication Required
@@ -677,7 +677,7 @@ Header Example: `Authorization: Token your_token_here`
 
 ## Request
 Method: GET
-URL: /api/regional-countries/NOR/ — Replace NOR with the cca3 code of the target country.
+URL: `/api/regional-countries/NOR/` — Replace NOR with the cca3 code of the target country.
 
 Headers: `Authorization: Token your_token_here`
 
@@ -690,7 +690,7 @@ Headers: `Authorization: Token your_token_here`
 ]
 ```
 
-# GET /api/same-language/<lang_code>/ — Get Countries by Language
+# 7. GET `/api/same-language/<lang_code>/` — Get Countries by Language
 Description: Retrieves a list of countries where the specified language (by language code) is spoken.
 
 Authentication Required
@@ -700,7 +700,7 @@ Header Example: `Authorization: Token your_token_here`
 
 ## Request
 Method: GET
-URL: /api/same-language/eng/ — Replace eng with the desired language code (e.g., spa, fra, deu).
+URL: `/api/same-language/eng/`  — Replace eng with the desired language code (e.g., spa, fra, deu).
 
 Headers: `Authorization: Token your_token_her`
 
@@ -714,7 +714,7 @@ Headers: `Authorization: Token your_token_her`
 ```
 
 
-# GET /api/countries/search/?search=<query> — Search Countries by Name
+# 8. GET `/api/countries/search/?search=<query>/` — Search Countries by Name
 Description: Search for countries by name. Supports partial matching, case-insensitive.
 
 🔐 Authentication Required
@@ -724,7 +724,7 @@ Header Example: `Authorization: Token your_token_here`
 
 ## Request
 Method: GET
-URL Example: /countries/search/?search=land
+URL Example: `/countries/search/?search=land`
 
 Query Parameters:
 
