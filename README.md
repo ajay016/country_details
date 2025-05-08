@@ -66,17 +66,15 @@ You will be redirected to the login page.
 
     Headers: `Content-Type: application/x-www-form-urlencoded`
     Body (form-data or x-www-form-urlencoded): 
-```
-    username=your_username
-    password=your_password
-```
+        username=your_username
+        password=your_password
 
-    Response from the server:
-    ```
+Response from the server:
+```
     {
         "token": "your_generated_token"
     }
-    ```
+```
 
 ### Use the Token in API Requests
 Once you obtain the token, include it in the Authorization header of subsequent API requests:
